@@ -18,13 +18,13 @@ class MyBallClass(pygame.sprite.Sprite):
     def move(self): 
         global points, score_text 
         self.rect = self.rect.move(self.speed) 
-        if self.rect.left < 0 or self.rect.right > screen.get_width():
-            self.speed[0] = -self.speed[0] 
-            if self.rect.top < screen.get_height(): 
+        if self.rect.top < 0 or self.rect.bottom > screen.get_height():           # __Ball bounces on top and bottom__ #
+            self.speed[1] = -self.speed[1]                                    # __Ball changes x direction on bounce__ #
+            if self.rect.left > 0:                                   # __Ball plays sound when hitting top/bot walls__ #
                 hit_wall.play()          #Play sound when the ball hits the side wall
                                                
-        if self.rect.top <= 0 : 
-            self.speed[1] = -self.speed[1] 
+        if self.rect.left <= 0 :                                          # __Ball plays sound when it hits the left__ #
+            self.speed[0] = -self.speed[0]
             points = points + 1 
             score_text = font.render(str(points), 1, (0, 0, 0)) 
             get_point.play()             #Plays sound when the ball hits the top
@@ -33,7 +33,7 @@ class MyBallClass(pygame.sprite.Sprite):
 class MyPaddleClass(pygame.sprite.Sprite): 
     def __init__(self, location = [0,0]): 
         pygame.sprite.Sprite.__init__(self) 
-        image_surface = pygame.surface.Surface([100, 20]) 
+        image_surface = pygame.surface.Surface([20, 100])                                  # __paddle is now vertical__#
         image_surface.fill([0,0,0]) 
         self.image    = image_surface.convert() 
         self.rect = self.image.get_rect() 
@@ -61,9 +61,9 @@ bye.set_volume(0.6)                                 #
 screen = pygame.display.set_mode([640,480]) 
 clock = pygame.time.Clock() 
 
-myBall = MyBallClass('wackyball.bmp', [12,6], [50, 50]) 
+myBall = MyBallClass('wackyball.bmp', [12,6], [50, 50])
 ballGroup = pygame.sprite.Group(myBall) 
-paddle = MyPaddleClass([270, 400]) 
+paddle = MyPaddleClass([560, 270])                                         # __Paddle appears on left side of screen__ #
 lives = 3 
 points = 0 
  
@@ -80,13 +80,13 @@ while running:
         if event.type == pygame.QUIT: 
             running = False 
         elif event.type == pygame.MOUSEMOTION: 
-            paddle.rect.centerx = event.pos[0] 
- 
+            paddle.rect.centery = event.pos[1]                         # __Paddle now follows vertical mouse movement__#
     if pygame.sprite.spritecollide(paddle, ballGroup, False): 
         hit.play()                              # Play sound when the ball hits the paddle
-        myBall.speed[1] = -myBall.speed[1] 
- 
-    myBall.move() 
+        myBall.speed[0] = -myBall.speed[0]                        # __Ball now changes x direction when hit by paddle__#
+
+    if lives > 0:                                           # __Added conditional so ball doesn't bounce after death__ #
+        myBall.move()
  
     if not done: 
         screen.blit(myBall.image, myBall.rect) 
@@ -97,7 +97,7 @@ while running:
             screen.blit(myBall.image, [width - 40 * i, 20]) 
         pygame.display.flip() 
  
-    if myBall.rect.top >= screen.get_rect().bottom: 
+    if myBall.rect.left >= screen.get_rect().right:                 # __Lose life when ball hits right side of screen__#
         if not done: 
             splat.play()           # Plays sound when the player loses a life
         lives = lives - 1 
@@ -115,7 +115,8 @@ while running:
             screen.blit(ft1_surf, [screen.get_width()/2 - \
                         ft1_surf.get_width()/2, 100]) 
             screen.blit(ft2_surf, [screen.get_width()/2 - \
-                        ft2_surf.get_width()/2, 200]) 
+                        ft2_surf.get_width()/2, 200])
+
 
             pygame.display.flip() 
             done = True 
