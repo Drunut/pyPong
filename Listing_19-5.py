@@ -23,7 +23,7 @@ class MyBallClass(pygame.sprite.Sprite):
             if self.rect.left > 0:                                   # __Ball plays sound when hitting top/bot walls__ #
                 hit_wall.play()          #Play sound when the ball hits the side wall
                                                
-        if self.rect.left <= 0 :                                          # __Ball plays sound when it hits the left__ #
+        if self.rect.right > screen.get_width() :                        # __Ball plays sound when it hits the right__ #
             self.speed[0] = -self.speed[0]
             points = points + 1 
             score_text = font.render(str(points), 1, (0, 0, 0)) 
@@ -61,9 +61,9 @@ bye.set_volume(0.6)                                 #
 screen = pygame.display.set_mode([640,480]) 
 clock = pygame.time.Clock() 
 
-myBall = MyBallClass('wackyball.bmp', [12,6], [50, 50])
+myBall = MyBallClass('wackyball.bmp', [-12,6], [400, 100])        # __ Ball starts moving left, starts farther right__ #
 ballGroup = pygame.sprite.Group(myBall) 
-paddle = MyPaddleClass([560, 270])                                         # __Paddle appears on left side of screen__ #
+paddle = MyPaddleClass([80, 270])                                          # __Paddle appears on left side of screen__ #
 lives = 3 
 points = 0 
  
@@ -97,7 +97,7 @@ while running:
             screen.blit(myBall.image, [width - 40 * i, 20]) 
         pygame.display.flip() 
  
-    if myBall.rect.left >= screen.get_rect().right:                 # __Lose life when ball hits right side of screen__#
+    if myBall.rect.right < 0:                                        # __Lose life when ball hits left side of screen__#
         if not done: 
             splat.play()           # Plays sound when the player loses a life
         lives = lives - 1 
@@ -124,7 +124,7 @@ while running:
         else: 
             pygame.time.delay(1000)                 
             new_life.play()                         #Play sound when a new life starts
-            myBall.rect.topleft = [50, 50] 
+            myBall.rect.topleft = [400, 100]                                # __Ball respawns farther right and down__ #
             screen.blit(myBall.image, myBall.rect) 
             pygame.display.flip() 
             pygame.time.delay(1000)
